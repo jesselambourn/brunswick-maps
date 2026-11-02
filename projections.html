@@ -146,7 +146,7 @@ function style(f){ const c=fill(f.properties);
   return c ? {color:'#333',weight:1,opacity:.7,fillColor:c,fillOpacity:opacity} : {color:'#777',weight:1,opacity:.6,dashArray:'3 3',fillColor:'#9aa3a0',fillOpacity:.15}; }
 function tip(p){
   if (!has(p)) return `<b>${p.num}</b><br>Fewer than 10 enrolled homes`;
-  if (!ok(p)) return `<b>${p.num}</b> · ${p.sub} · finished<br>Left out of the ranking (finished maps hidden)<br>${p.left} enrolled homes not yet knocked`;
+  if (!ok(p)) return `<b>${p.num}</b> · ${p.sub} · finished<br>Left out of the ranking (finished maps hidden)<br>${p.left} enrolled homes not yet knocked${p.blk?` (plus ${p.blk} in no-access buildings)`:''}`;
   return `<b>${p.num}</b> · ${p.sub} · ${p.st}<br><b style="font-size:14px">#${metric.rk(p)} of ${p.c}</b> in ${p.grp===p.sub?p.sub:p.grp==='District'?'the district':p.grp} on ${metric.name.toLowerCase()}`+
     `<br>Expected: score ${sc(p.ev)} per 100 answers · ${pc(p.es)} supportive, ${pc(p.eo)} opposing, net ${pc(p.en)}`+
     `<br>Ranks within ${scope.of}: score #${p.rv}, support #${p.rs}, net #${p.rn}, opposition #${p.ro}`+
