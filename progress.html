@@ -807,6 +807,7 @@ h1 { font-family: var(--display); font-stretch: 80%; font-weight: 800; font-size
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>if (window.L) L.Map.addInitHook(function () { (window.__lmaps = window.__lmaps || []).push(this); });</script>
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js"></script>
@@ -995,5 +996,35 @@ window.DATA={"maps":{"type":"FeatureCollection","features":[{"type":"Feature","p
 })();
 </script>
 
+<style>
+.vpin { display:flex; align-items:center; justify-content:center; font:800 10px/1 'Public Sans', Arial, sans-serif; color:#fff; }
+.vpin.evc { width:34px; height:34px; border-radius:50%; background:#b0127a; border:3px solid #fff; box-shadow:0 0 0 2px #b0127a, 0 2px 8px rgba(0,0,0,.45); letter-spacing:.02em; }
+.vpin.vc { width:16px; height:16px; border-radius:4px; background:#fff; border:2.5px solid #1d2b36; color:#1d2b36; font-size:8px; box-shadow:0 1px 3px rgba(0,0,0,.35); }
+.vleg { background:rgba(255,255,255,.94); color:#18222c; padding:7px 10px; border-radius:8px; font:12px/1.5 'Public Sans', Arial, sans-serif; box-shadow:0 1px 4px rgba(0,0,0,.3); }
+.vleg div { display:flex; align-items:center; gap:7px; } .vleg .vpin.evc { width:18px; height:18px; border-width:2px; font-size:6px; box-shadow:0 0 0 1px #b0127a; } .vleg .vpin.vc { width:12px; height:12px; border-width:2px; }
+.vtip b { font-size:13px; } .vtip .k { color:#b0127a; font-weight:700; }
+</style>
+<script>
+(function () {
+  const V = [{"t":"evc","n":"Victoria Street Brunswick Voting Centre","a":"459 Victoria Street, Brunswick West","v":14988,"lat":-37.7651,"lon":144.94735,"also":true},{"t":"evc","n":"Carlton Scout Hall","a":"12 Shakespeare Street, Carlton North","v":9079,"lat":-37.78781,"lon":144.9699,"also":true},{"t":"evc","n":"Laconian House","a":"253 Albert Street, Brunswick","v":11665,"lat":-37.76886,"lon":144.96277,"also":true},{"t":"vc","n":"Brunswick Secondary College","l":"Brunswick","a":"47 Dawson Street, Brunswick","v":1180,"lat":-37.770843,"lon":144.954288},{"t":"vc","n":"Brunswick East Primary School","l":"Brunswick East","a":"195A Stewart Street, Brunswick East","v":1639,"lat":-37.765119,"lon":144.978739},{"t":"vc","n":"Brunswick North Primary School","l":"Brunswick North","a":"144 Pearson Street, Brunswick West","v":1346,"lat":-37.760303,"lon":144.950344},{"t":"vc","n":"Brunswick North West Primary School","l":"Brunswick North West","a":"2 Culloden Street, Brunswick West","v":237,"lat":-37.757016,"lon":144.944492},{"t":"vc","n":"Brunswick South Primary School","l":"Brunswick South","a":"56 Brunswick Road, Brunswick East","v":2166,"lat":-37.778714,"lon":144.972903},{"t":"vc","n":"Brunswick South West Primary School","l":"Brunswick South West","a":"5A South Daly Street, Brunswick West","v":1028,"lat":-37.771338,"lon":144.943375},{"t":"vc","n":"Carlton North Primary School","l":"Carlton Central","a":"60 Lee Street, Carlton North","v":878,"lat":-37.791228,"lon":144.973457},{"t":"vc","n":"Fitzroy High School","l":"Curtain","a":"24-30 Falconer Street, Fitzroy North","v":896,"lat":-37.785009,"lon":144.987176},{"t":"vc","n":"Clifton Hill Presbyterian Church Hall","l":"Delbridge","a":"Corner of Michael Street and McKean Street, Fitzroy North","v":601,"lat":-37.787102,"lon":144.990233},{"t":"vc","n":"Brunswick Town Hall","l":"Edward","a":"233 Sydney Road, Brunswick","v":1619,"lat":-37.771585,"lon":144.961141},{"t":"vc","n":"Fitzroy Primary School","l":"Fitzroy","a":"319 George Street, Fitzroy","v":430,"lat":-37.799862,"lon":144.981483},{"t":"vc","n":"Fitzroy North Primary School","l":"Fitzroy North","a":"Corner Fergie Street and Alfred Crescent, Fitzroy North","v":1189,"lat":-37.785184,"lon":144.985444},{"t":"vc","n":"Holy Trinity Serbian Orthodox Church","l":"Glen Nichol","a":"Corner Nicholson Street and Glenlyon Road, Brunswick East","v":1788,"lat":-37.773616,"lon":144.97877},{"t":"vc","n":"St Joseph's School Hall (Brunswick West)","l":"Melville","a":"185 Hope Street, Brunswick West","v":492,"lat":-37.762071,"lon":144.943111},{"t":"vc","n":"Merri Creek Primary School","l":"Merri Creek","a":"175 Miller Street, Fitzroy North","v":834,"lat":-37.776985,"lon":144.98701},{"t":"vc","n":"Merri-bek Primary School","l":"Merri-bek","a":"157-163 Moreland Road, Coburg","v":424,"lat":-37.755667,"lon":144.967418},{"t":"vc","n":"St Margaret Mary's Church Hall","l":"Mitchell Street","a":"68A Donald Street, Brunswick North","v":1376,"lat":-37.758186,"lon":144.96811}];
+  function add(map) {
+    if (!map || map.__venues) return; map.__venues = true;
+    map.createPane('venues'); map.getPane('venues').style.zIndex = 640;
+    const g = L.layerGroup().addTo(map);
+    V.slice().sort((a, b) => (a.t === 'evc') - (b.t === 'evc')).forEach(p => {
+      const evc = p.t === 'evc';
+      const icon = L.divIcon({ className: '', html: `<div class="vpin ${p.t}">${evc ? 'EVC' : 'V'}</div>`, iconSize: evc ? [40, 40] : [21, 21], iconAnchor: evc ? [20, 20] : [10.5, 10.5] });
+      const tip = evc ? `<div class="vtip"><span class="k">EARLY VOTING CENTRE</span><br><b>${p.n}</b><br>${p.a}<br>Open from Wed 18 Nov · VEC estimate ${p.v.toLocaleString()} early votes${p.also ? '<br>Also an election-day voting centre (Sat 28 Nov)' : ''}</div>`
+                      : `<div class="vtip"><span class="k" style="color:#1d2b36">ELECTION-DAY VOTING CENTRE</span><br><b>${p.n}</b> (${p.l})<br>${p.a}<br>Sat 28 Nov · VEC estimate ${p.v.toLocaleString()} votes</div>`;
+      L.marker([p.lat, p.lon], { icon, pane: 'venues', zIndexOffset: evc ? 1000 : 0, keyboard: false }).bindTooltip(tip, { direction: 'top', offset: [0, evc ? -18 : -9] }).addTo(g);
+    });
+    const leg = L.control({ position: 'topright' });
+    leg.onAdd = () => { const d = L.DomUtil.create('div', 'vleg'); d.innerHTML = '<div><span class="vpin evc">EVC</span>Early voting centre</div><div><span class="vpin vc"></span>Election-day voting centre</div>'; return d; };
+    leg.addTo(map);
+  }
+  (window.__lmaps || []).forEach(add);
+  if (window.L) L.Map.addInitHook(function () { add(this); });
+})();
+</script>
 </body>
 </html>
